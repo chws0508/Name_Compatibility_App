@@ -28,7 +28,7 @@ abstract class BaseDataSource {
      */
     suspend inline fun <T> safeApiCall(emitter: RemoteErrorEmitter, crossinline callFunction: suspend () -> T): T? {
         return try{
-            val myObject = withContext(Dispatchers.IO){ callFunction.invoke() }
+            val myObject = withContext(Dispatchers.IO){ callFunction.invoke() }//invoke: 매개변수가 넘어오기 까지 함수를 지연호출한다.
             myObject
         }catch (e: Exception){
             withContext(Dispatchers.Main){

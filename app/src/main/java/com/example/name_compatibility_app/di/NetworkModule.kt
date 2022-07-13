@@ -58,6 +58,7 @@ object NetworkModule {
         return retrofit.create(LoveCalculatorApi::class.java)
     }
 
+    //Logcat에 okhttp입력하면 통신기록 확인 가능
     private fun getLoggingInterceptor(): HttpLoggingInterceptor =
         HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
 

@@ -3,10 +3,9 @@ package com.example.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.domain.model.DomainDataScore
 import com.example.domain.model.DomainLoveResponse
-import com.example.domain.usecase.CheckLoveCalculatorUseCase
-import com.example.domain.usecase.GetStatisticsUseCase
-import com.example.domain.usecase.SetStatisticsUseCase
+import com.example.domain.usecase.*
 import com.example.domain.utils.ErrorType
 import com.example.domain.utils.RemoteErrorEmitter
 import com.example.domain.utils.ScreenState
@@ -20,20 +19,27 @@ class MainViewModel @Inject constructor(
     private val checkLoveCalculatorUseCase: CheckLoveCalculatorUseCase,
     private val getStatisticsUseCase: GetStatisticsUseCase,
     private val setStatisticsUseCase: SetStatisticsUseCase,
+    private val setScoreUseCase: SetScoreUseCase,
+    private val getScoreUseCase: GetScoreUseCase
 
 ) : ViewModel(), RemoteErrorEmitter {
 
     private var _apiCallEvent = SingleLiveEvent<ScreenState>()
     val apiCallEvent: LiveData<ScreenState> get() = _apiCallEvent
 
+
     private var _getStatisticsEvent = SingleLiveEvent<Int>()
     val getStatisticsEvent: LiveData<Int> get() = _getStatisticsEvent
+
+    private var _getScoreEvent = SingleLiveEvent<Int>()
+    val getScoreEvent: LiveData<Int> get() = _getScoreEvent
 
     var apiCallResult = DomainLoveResponse("", "", 0, "")
     var apiErrorType = ErrorType.UNKNOWN
     var apiErrorTypeMessage = "none"
     var manNameResult:String ="man"
     var womanNameResult:String = "woman"
+    var scoreList  = arrayListOf<DomainDataScore>()
 
 
     fun checkLoveCalculator(
@@ -66,10 +72,23 @@ class MainViewModel @Inject constructor(
 
     fun getStatistics()= getStatisticsUseCase.execute()
 
-    fun getStatisticsDisply() =getStatisticsUseCase.execute()
+    fun getStatisticsDisply() =getStatistics()
         .addOnSuccessListener {
-            _getStatisticsEvent.postValue(it.value.toString().toInt())
+            _getStatisticsEvent.postValue(it.value.toString().toInt() )
         }
 
+    fun getScore()=getScoreUseCase.execute().addOnSuccessListener {
+        snapshot->scoreList.clear()
+        for (item in snapshot.documents){
+            item.toObject(DomainDataScore::class.java).let {
+                scoreList.add(it!!)
+            }
+        }
+        _getScoreEvent.call()
+    }
+
+    fun setScore(man:String,woman:String,percentage:Int,date:String){
+        setScoreUseCase.execute(DomainDataScore(man,woman,percentage,date))
+    }
 
 }

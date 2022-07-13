@@ -9,6 +9,7 @@ import retrofit2.http.Query
 
 
 interface LoveCalculatorApi {
+
     @GET("/getPercentage")//문서의 요청 형태 (METHOD) 부분이 GET 이기 떄문에 어노테이션 GET 을 붙임
     suspend fun getPercentage(
         @Header("X-RapidAPI-Key")key :String,//헤더부분 어노테이션 붙여서 함
